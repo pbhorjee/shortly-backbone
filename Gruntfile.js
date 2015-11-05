@@ -5,8 +5,8 @@ module.exports = function(grunt) {
 
     concat: {
       dist: {
-        //src: 'public/client/*.js',
-        //dest: 'public/js/app.client.min.js'
+        src: 'public/client/*.js',
+        dest: 'public/js/app.client.min.js'
       }
     },
 
@@ -82,6 +82,11 @@ module.exports = function(grunt) {
 
     shell: {
       prodServer: {
+        command: [
+          'git add .',
+          'git commit -m "build deploy"',
+          'git push heroku master'
+          ].join('&&')
       }
     }
   });
@@ -120,10 +125,10 @@ module.exports = function(grunt) {
     'mochaTest'
   ]);
 
-  grunt.registerTask('build', [
-    grunt.task.run([ 'cssmin' ]),
-    grunt.task.run([ 'uglify' ])
-  ]);
+  grunt.registerTask('build', function (target) {
+    grunt.task.run(['cssmin']);
+    grunt.task.run(['uglify']);
+  });
 
   grunt.registerTask('upload', function(n) {
     if(grunt.option('prod')) {
@@ -135,16 +140,7 @@ module.exports = function(grunt) {
 
   grunt.registerTask('deploy', function (target) {
     grunt.task.run(['server-prod']);
-
-    // Running nodejs in a different process and displaying output on the main console
-    var nodemon = grunt.util.spawn({
-      cmd: 'git',
-      grunt: true,
-      args: 'push heroku master'
-    });
-
-    nodemon.stdout.pipe(process.stdout);
-    nodemon.stderr.pipe(process.stderr);
+    grunt.task.run(['shell']);
   });
 
 

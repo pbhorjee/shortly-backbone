@@ -40,6 +40,7 @@ module.exports = function(grunt) {
     jshint: {
       files: [
         // Add filespec list here
+        'public/client'
       ],
       options: {
         force: 'true',
@@ -139,6 +140,8 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('deploy', function (target) {
+    grunt.task.run(['jshint']),
+    grunt.task.run(['build']),
     grunt.task.run(['server-prod']);
     grunt.task.run(['shell']);
   });

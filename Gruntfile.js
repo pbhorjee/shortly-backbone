@@ -2,7 +2,12 @@ module.exports = function(grunt) {
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
+
     concat: {
+      dist: {
+        //src: 'public/client/*.js',
+        //dest: 'public/js/app.client.min.js'
+      }
     },
 
     mochaTest: {
@@ -21,6 +26,15 @@ module.exports = function(grunt) {
     },
 
     uglify: {
+      mangle: {
+        except: ['jQuery', 'Backbone', 'Handlebars', 'Underscore']
+      },
+      my_target: {
+        files: {
+          //'public/js/lib.min.js': 'public/lib/*.js',
+          'public/js/app.client.min.js': 'public/client/*.js'
+        }
+      }
     },
 
     jshint: {
@@ -38,13 +52,22 @@ module.exports = function(grunt) {
     },
 
     cssmin: {
+      minify: {
+        files: [{
+          expand: true,
+          cwd: 'public/',
+          src: ['*.css', '!*.min.css'],
+          dest: 'public/css/',
+          ext: '.min.css'
+        }]
+      }
     },
 
     watch: {
       scripts: {
         files: [
-          'public/client/**/*.js',
-          'public/lib/**/*.js',
+          'public/client/*/*.js',
+          'public/lib/*/*.js'
         ],
         tasks: [
           'concat',
@@ -60,7 +83,7 @@ module.exports = function(grunt) {
     shell: {
       prodServer: {
       }
-    },
+    }
   });
 
   grunt.loadNpmTasks('grunt-contrib-uglify');
@@ -85,6 +108,10 @@ module.exports = function(grunt) {
     grunt.task.run([ 'watch' ]);
   });
 
+  grunt.registerTask('server-prod', function (target) {
+    grunt.task.run([ 'build' ]);
+  });
+
   ////////////////////////////////////////////////////
   // Main grunt tasks
   ////////////////////////////////////////////////////
@@ -94,19 +121,31 @@ module.exports = function(grunt) {
   ]);
 
   grunt.registerTask('build', [
+    grunt.task.run([ 'cssmin' ]),
+    grunt.task.run([ 'uglify' ])
   ]);
 
   grunt.registerTask('upload', function(n) {
     if(grunt.option('prod')) {
-      // add your production server task here
+      grunt.task.run([ 'server-prod' ]);
     } else {
       grunt.task.run([ 'server-dev' ]);
     }
   });
 
-  grunt.registerTask('deploy', [
-    // add your deploy tasks here
-  ]);
+  grunt.registerTask('deploy', function (target) {
+    grunt.task.run(['server-prod']);
+
+    // Running nodejs in a different process and displaying output on the main console
+    var nodemon = grunt.util.spawn({
+      cmd: 'git',
+      grunt: true,
+      args: 'push heroku master'
+    });
+
+    nodemon.stdout.pipe(process.stdout);
+    nodemon.stderr.pipe(process.stderr);
+  });
 
 
 };

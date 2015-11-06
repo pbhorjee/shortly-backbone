@@ -1,7 +1,7 @@
 var mongoose = require('mongoose');
 
 
-mongoURI = process.env.CUSTOMCONNSTR_MONGOLAB_URI || 'mongodb://localhost/shortly';
+mongoURI = process.env.MONGOLAB_URI || 'mongodb://localhost/shortly';
 
 console.log(mongoURI);
 

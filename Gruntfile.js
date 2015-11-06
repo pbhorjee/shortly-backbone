@@ -127,6 +127,7 @@ module.exports = function(grunt) {
   ]);
 
   grunt.registerTask('build', function (target) {
+    grunt.task.run(['jshint']);
     grunt.task.run(['cssmin']);
     grunt.task.run(['uglify']);
   });
@@ -140,11 +141,8 @@ module.exports = function(grunt) {
   });
 
   grunt.registerTask('deploy', function (target) {
-    grunt.task.run(['jshint']);
     grunt.task.run(['build']);
     grunt.task.run(['server-prod']);
     grunt.task.run(['shell']);
   });
-
-
 };
